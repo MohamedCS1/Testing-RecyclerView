@@ -1,6 +1,5 @@
 package com.codingwithmitch.espressouitestexamples.ui.movie
 
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,10 +7,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.bumptech.glide.Glide
 import com.example.testingrecyclerview.R
 import com.example.testingrecyclerview.data.Movie
-
+import kotlinx.coroutines.GlobalScope
 
 
 class MoviesListAdapter(private val interaction: Interaction? = null) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -48,7 +49,11 @@ class MoviesListAdapter(private val interaction: Interaction? = null) : Recycler
     }
 
     fun submitList(list: List<Movie>) {
-        differ.submitList(list)
+
+
+        GlobalScope. {
+            differ.submitList(list)
+        }.run()
     }
 
     class MovieViewHolder

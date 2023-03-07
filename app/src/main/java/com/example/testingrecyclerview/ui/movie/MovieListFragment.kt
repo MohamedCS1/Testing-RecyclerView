@@ -1,6 +1,8 @@
 package com.example.testingrecyclerview.ui.movie
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,16 +11,23 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.codingwithmitch.espressouitestexamples.ui.movie.MoviesListAdapter
 import com.example.testingrecyclerview.R
+import com.example.testingrecyclerview.data.FakeMovieData
 import com.example.testingrecyclerview.data.Movie
 import com.example.testingrecyclerview.data.source.MoviesDataSource
 import com.example.testingrecyclerview.ui.UICommunicationListener
 import com.example.testingrecyclerview.util.TopSpacingItemDecoration
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 class MovieListFragment(
     val moviesDataSource: MoviesDataSource
 ) : Fragment(),
     MoviesListAdapter.Interaction
 {
+
     override fun onItemSelected(position: Int, item: Movie) {
         activity?.run {
             val bundle = Bundle()
@@ -32,6 +41,7 @@ class MovieListFragment(
 
     lateinit var recycler_view:RecyclerView
     lateinit var listAdapter: MoviesListAdapter
+    lateinit var uiCommunicationListener: UICommunicationListener
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +61,16 @@ class MovieListFragment(
     }
 
     private fun getData(){
-        listAdapter.submitList(moviesDataSource.getMovies())
+        uiCommunicationListener.loading(true)
+        val job = GlobalScope.launch {
+            delay(FakeMovieData.FAKE_NETWORK_DELAY)
+        }
+        job.invokeOnCompletion {
+            GlobalScope.launch {
+                uiCommunicationListener.loading(false)
+                listAdapter.submitList(moviesDataSource.getMovies())
+            }
+        }
     }
 
     private fun initRecyclerView() {
@@ -64,7 +83,14 @@ class MovieListFragment(
         }
     }
 
-
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        try{
+            uiCommunicationListener = context as UICommunicationListener
+        }catch (e: ClassCastException){
+            Log.e("error", "Must implement interface in $activity: ${e.message}")
+        }
+    }
 }
 
 
