@@ -50,6 +50,7 @@ dependencies {
     //Espresso
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test:rules:1.5.0'
+    implementation "androidx.test.espresso:espresso-idling-resource:3.5.1"
 
     debugImplementation("androidx.fragment:fragment-testing-manifest:1.6.0-alpha06")
     debugImplementation("androidx.fragment:fragment-testing:1.6.0-alpha06")

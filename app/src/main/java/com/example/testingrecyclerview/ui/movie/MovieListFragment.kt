@@ -15,6 +15,7 @@ import com.example.testingrecyclerview.data.FakeMovieData
 import com.example.testingrecyclerview.data.Movie
 import com.example.testingrecyclerview.data.source.MoviesDataSource
 import com.example.testingrecyclerview.ui.UICommunicationListener
+import com.example.testingrecyclerview.util.EspressoIdlingResource
 import com.example.testingrecyclerview.util.TopSpacingItemDecoration
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -61,6 +62,7 @@ class MovieListFragment(
     }
 
     private fun getData(){
+        EspressoIdlingResource.increment()
         uiCommunicationListener.loading(true)
         val job = GlobalScope.launch {
             delay(FakeMovieData.FAKE_NETWORK_DELAY)
@@ -69,6 +71,7 @@ class MovieListFragment(
             GlobalScope.launch {
                 uiCommunicationListener.loading(false)
                 listAdapter.submitList(moviesDataSource.getMovies())
+                EspressoIdlingResource.decrement()
             }
         }
     }

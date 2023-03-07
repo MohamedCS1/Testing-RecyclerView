@@ -8,11 +8,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread
 import com.bumptech.glide.Glide
 import com.example.testingrecyclerview.R
 import com.example.testingrecyclerview.data.Movie
+import com.example.testingrecyclerview.util.EspressoIdlingResource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MoviesListAdapter(private val interaction: Interaction? = null) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -49,11 +52,14 @@ class MoviesListAdapter(private val interaction: Interaction? = null) : Recycler
     }
 
     fun submitList(list: List<Movie>) {
-
-
-        GlobalScope. {
-            differ.submitList(list)
-        }.run()
+        val dataCommitCallback = Runnable {
+            EspressoIdlingResource.decrement()
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.Main){
+                differ.submitList(list ,dataCommitCallback)
+            }
+        }
     }
 
     class MovieViewHolder

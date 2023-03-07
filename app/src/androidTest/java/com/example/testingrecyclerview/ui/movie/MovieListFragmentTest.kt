@@ -3,6 +3,7 @@ package com.example.testingrecyclerview.ui.movie
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
@@ -14,6 +15,9 @@ import com.codingwithmitch.espressouitestexamples.ui.movie.MoviesListAdapter
 import com.codingwithmitch.espressouitestexamples.ui.movie.StarActorsFragment
 import com.example.testingrecyclerview.R
 import com.example.testingrecyclerview.data.FakeMovieData
+import com.example.testingrecyclerview.util.EspressoIdlingResource
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,6 +31,18 @@ internal class MovieListFragmentTest
 
     val positionItemsInTest = 4
     val movieInTest = FakeMovieData.movies[positionItemsInTest]
+
+    @Before
+    fun registerIdlingResource()
+    {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlResource)
+    }
+
+    @After
+    fun unregisterIdlingResource()
+    {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlResource)
+    }
 
     @Test
     fun testIsListFragmentVisibleOnAppLaunch()
